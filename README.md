@@ -2,7 +2,7 @@
 Procedural Dungeon Map
 
 
-From article in [Practical Computing March 1982][1], page 93
+From an article, by *G.T.Relf*, in [Practical Computing March 1982][1], page 93
 
 [![https://i.stack.imgur.com/i4qoX.jpg][2]][2]
 

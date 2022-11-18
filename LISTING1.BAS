@@ -1,0 +1,8 @@
+10 INPUT X
+20 C = COS(X)
+30 C = C*100
+40 C = ABS(C)
+50 C = C - INT(C)
+60 C = C*100
+70 C = INT(C)
+80 PRINT C

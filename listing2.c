@@ -188,7 +188,7 @@ void current_location_attributes(void) {
   /* CHECK FOR EARTHQUAKES: */
   if (rand() % 1000 == 9) {
     printf("RUMBLE, RUMBLE...");
-    /*threashold = threshold + 0.2 * rand() - 0.1;*/
+    /*threshold = threshold + 0.2 * rand() - 0.1;*/
     threshold = threshold + 0.2 * randomFloat() - 0.1;
   }
   /* INSERT OTHER LOCATION-DEPENDANT TESTS HERE.*/
@@ -197,6 +197,8 @@ void current_location_attributes(void) {
     z = z + 1;
     if (w() < threshold) {
       printf("A shaft descends from here...\n");
+    } else {
+      printf("There is no shaft - keep searching North, South, East or West...\n");
     }
     z = z - 1;
   } else {
@@ -261,6 +263,8 @@ int main(void) {
     }
     printf("Enter a direction: ");
     scanf("%c", & command);
+    /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
+    getchar();
     switch (command) {
       case 'n':
         go_north();

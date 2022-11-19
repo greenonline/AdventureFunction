@@ -7,6 +7,8 @@ Listing 1: Code example using cosine to generate random numbers
 
 Listing 2: **Mammoth Maze**
 
+Note: There is an omission, in the published listing, at line 250 to call the random number generator. This is fixed in `LISTING1_FIXED.BAS`.
+
 [![Practical Computing, March 1982 - page 93][2]][2]
 
 [![Practical Computing, March 1982 - page 95][3]][3]

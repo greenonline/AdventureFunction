@@ -262,9 +262,11 @@ int main(void) {
       printf("DEBUG: w=%f\n", w());
     }
     printf("Enter a direction: ");
-    scanf("%c", & command);
     /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
-    getchar();
+    scanf(" %c", &command);
+    /* or */
+    /*scanf("%c", &command);*/
+    /*getchar();*/
     switch (command) {
       case 'n':
         go_north();

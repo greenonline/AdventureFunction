@@ -89,11 +89,8 @@ Write your code in this editor and press "Run" button to compile and execute it.
 *******************************************************************************/
 
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <math.h>
-
 #include <time.h>
 
 /*
@@ -102,11 +99,10 @@ int threashold=0.3;
 */
 /*int w;*/
 int x, y, z;
-int threshold;
-int DEBUG = 1;
+float threshold;
+int DEBUG = 0;
 
-void
-set_random_seed() {
+void set_random_seed() {
   srand(0);
   /* https://stackoverflow.com/questions/1694827/random-float-number */
   /* https://stackoverflow.com/questions/822323/how-to-generate-a-random-int-in-c */
@@ -119,8 +115,7 @@ float randomFloat() {
   return r;
 }
 
-float
-location_random() {
+float location_random() {
   if (DEBUG) {
     printf("DEBUG: multi= %d\n", x * x + y * y * z);
     printf("DEBUG: sqrt= %f\n", sqrt(x * x + y * y * z));
@@ -129,12 +124,11 @@ location_random() {
   return (u - (int) u);
 }
 
-float
-w() {
+float w() {
   return (location_random());
 }
 
-void go_north() {
+void go_north(void) {
   y = y + 1;
   if (w() >= threshold && z != 1) {
     printf("Impossible\n");
@@ -142,7 +136,7 @@ void go_north() {
   }
 }
 
-void go_south() {
+void go_south(void) {
   y = y - 1;
   if (w() >= threshold && z != 1) {
     printf("Impossible\n");
@@ -150,28 +144,31 @@ void go_south() {
   }
 }
 
-void go_east() {
+void go_east(void) {
   x = x + 1;
   if (w() >= threshold && z != 1) {
     printf("Impossible\n");
     x = x - 1;
   }
 }
-void go_west() {
+
+void go_west(void) {
   x = x - 1;
   if (w() >= threshold && z != 1) {
     printf("Impossible\n");
     x = x + 1;
   }
 }
-void go_up() {
+
+void go_up(void) {
   z = z - 1;
   if (w() >= threshold && z < 1) {
     printf("Impossible\n");
     z = z + 1;
   }
 }
-void go_down() {
+
+void go_down(void) {
   z = z + 1;
   if (w() >= threshold) {
     printf("Impossible\n");
@@ -179,24 +176,22 @@ void go_down() {
   }
 }
 
-void
-current_location_attributes() {
+void current_location_attributes(void) {
   int v = (int)(w() * 1000);
   if (v > 35 && v < 39 && z > 1) {
     printf("HERE IS A CROCK OF GOLD!");
+    /* YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND! */
   }
   /*
-     REM (YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND!)
-     280 REM INSERT OTHER ATTRIBUTE TESTS HERE.
-
+     INSERT OTHER ATTRIBUTE TESTS HERE.
    */
-  /*REM CHECK FOR EARTHQUAKES: */
+  /* CHECK FOR EARTHQUAKES: */
   if (rand() % 1000 == 9) {
     printf("RUMBLE, RUMBLE...");
     /*threashold = threshold + 0.2 * rand() - 0.1;*/
     threshold = threshold + 0.2 * randomFloat() - 0.1;
   }
-  /* REM INSERT OTHER LOCATION-DEPENDANT TESTS HERE.*/
+  /* INSERT OTHER LOCATION-DEPENDANT TESTS HERE.*/
   if (z == 1) {
     printf("Ground level - ");
     z = z + 1;
@@ -240,22 +235,20 @@ current_location_attributes() {
       nc = nc + 1;
     }
     z = z + 1;
+    printf("\n");
     if (nc == 0) {
-      printf("None - the earthquake has trapped you");
+      printf("None - the earthquake has trapped you\n");
     }
-
   }
 }
 
-void
-init(void) {
+void init(void) {
   x = 103, y = 97, z = 1;
   threshold = 0.3;
   set_random_seed();
 }
 
-int
-main(void) {
+int main(void) {
   char command;
 
   init();
@@ -269,28 +262,27 @@ main(void) {
     printf("Enter a direction: ");
     scanf("%c", & command);
     switch (command) {
-    case 'n':
-      go_north();
-      break;
-    case 's':
-      go_south();
-      break;
-    case 'e':
-      go_east();
-      break;
-    case 'w':
-      go_west();
-      break;
-    case 'u':
-      go_up();
-      break;
-    case 'd':
-      go_down();
-      break;
-    default:
-      printf("Invalid input!\n");
+      case 'n':
+        go_north();
+        break;
+      case 's':
+        go_south();
+        break;
+      case 'e':
+        go_east();
+        break;
+      case 'w':
+        go_west();
+        break;
+      case 'u':
+        go_up();
+        break;
+      case 'd':
+        go_down();
+        break;
+      default:
+        printf("Invalid input!\n");
     }
-
   }
   while (1);
 

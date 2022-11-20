@@ -8,11 +8,7 @@ Original concept: G.T.Relf
 
 TODO:
 
- - Prevent zero for x and y
- - Display co-ords - VERBOSE_LOCATION
- - Add and Display gold count
- - getopts to turn on/off options
- 
+ - Prevent zero for x and y 
  
 Original code:
 
@@ -98,6 +94,9 @@ Original code:
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+/* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html */
+#include <ctype.h>
+#include <unistd.h>
 
 /*
 int x=103,y=97,z=1;
@@ -222,6 +221,57 @@ void do_look(void) {
   printf("Gold pieces: %d\n", gold_pieces);
 }
 
+/* Level one functions */
+
+void set_options(int argc, char **argv) {
+  /* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html */
+  int aflag = 0;
+  int bflag = 0;
+  char *cvalue = NULL;
+  int index;
+  int c;
+
+  opterr = 0;
+
+  while ((c = getopt (argc, argv, "abc:")) != -1)
+    switch (c)
+      {
+      case 'd':
+        DEBUG = 1;
+        break;
+      case 'l':
+        VERBOSE_LOCATION = 1;
+        break;
+      case 'm':
+        VERBOSE_MOVE = 1;
+        break;
+      case 'c':
+        cvalue = optarg;
+        break;
+      case '?':
+        if (optopt == 'c')
+          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+        else if (isprint (optopt))
+          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+        else
+          fprintf (stderr,
+                   "Unknown option character `\\x%x'.\n",
+                   optopt);
+        return 1;
+      default:
+        abort ();
+      }
+
+}
+
+void init(void) {
+  x = 103, y = 97, z = 1;
+  threshold = 0.3;
+  crocks = 0;
+  gold_pieces = 0;
+  set_random_seed();
+}
+
 void current_location_attributes(void) {
   int v = (int)(w() * 1000);
   if (v > 35 && v < 39 && z > 1) {
@@ -298,16 +348,45 @@ void current_location_attributes(void) {
   }
 }
 
-void init(void) {
-  x = 103, y = 97, z = 1;
-  threshold = 0.3;
-  crocks = 0;
-  gold_pieces = 0;
-  set_random_seed();
+void get_command(void){
+ char command;
+
+ printf("Enter a direction: ");
+ /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
+ scanf(" %c", &command);
+ /* or */
+ /*scanf("%c", &command);*/
+ /*getchar();*/
+ switch (command) {
+    case 'n':
+      go_north();
+      break;
+    case 's':
+      go_south();
+      break;
+    case 'e':
+      go_east();
+      break;
+    case 'w':
+      go_west();
+      break;
+    case 'u':
+      go_up();
+      break;
+    case 'd':
+      go_down();
+      break;
+    case 'l':
+      do_look();
+      break;
+    default:
+      printf("Invalid input!\n");
+  }
 }
 
-int main(void) {
-  char command;
+int main(int argc, char **argv) {
+
+  set_options(argc, argv);
 
   init();
 
@@ -317,37 +396,8 @@ int main(void) {
     if (DEBUG) {
       printf("DEBUG: w=%f\n", w());
     }
-    printf("Enter a direction: ");
-    /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
-    scanf(" %c", &command);
-    /* or */
-    /*scanf("%c", &command);*/
-    /*getchar();*/
-    switch (command) {
-      case 'n':
-        go_north();
-        break;
-      case 's':
-        go_south();
-        break;
-      case 'e':
-        go_east();
-        break;
-      case 'w':
-        go_west();
-        break;
-      case 'u':
-        go_up();
-        break;
-      case 'd':
-        go_down();
-        break;
-      case 'l':
-        do_look();
-        break;
-      default:
-        printf("Invalid input!\n");
-    }
+    get_command();
+
   }
   while (1);
 

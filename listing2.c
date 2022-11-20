@@ -1,6 +1,7 @@
-#include <stdio.h>
+/******************************************************************************
 
-/* 
+Original code:
+
 10 PRINT "MAMMOTH MAZE in 2.5K BYTES BY G.T.RELF"
 20 REM SET STARTING POSITION (EAST, WEST, DOWN):
 30 X=103 : Y=97 : Z=1
@@ -76,16 +77,6 @@
 720 U=U*100*SQR(X*X+Y*Y*Z)
 730 W=U-INT(U)
 740 RETURN
-
-*/
-
-
-/******************************************************************************
-
-                            Online C Compiler.
-                Code, Compile, Run and Debug C program online.
-Write your code in this editor and press "Run" button to compile and execute it.
-
 *******************************************************************************/
 
 #include <stdio.h>
@@ -101,6 +92,7 @@ int threashold=0.3;
 int x, y, z;
 float threshold;
 int DEBUG = 0;
+int VERBOSE_MOVE = 0;
 
 void set_random_seed() {
   srand(0);
@@ -109,6 +101,7 @@ void set_random_seed() {
   /*srand(time(NULL));*/
 }
 
+/* Generate a float between 0 and 1 */
 /* https://stackoverflow.com/questions/1694827/random-float-number */
 float randomFloat() {
   float r = (float) rand() / (float) RAND_MAX;
@@ -131,48 +124,72 @@ float w() {
 void go_north(void) {
   y = y + 1;
   if (w() >= threshold && z != 1) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     y = y - 1;
+  } else {
+    if (VERBOSE_MOVE) {
+      printf("You go north.\n");
+    }  
   }
 }
 
 void go_south(void) {
   y = y - 1;
   if (w() >= threshold && z != 1) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     y = y + 1;
+  } else {
+    if (VERBOSE_MOVE) {
+      printf("You go south.\n");
+    }
   }
 }
 
 void go_east(void) {
   x = x + 1;
   if (w() >= threshold && z != 1) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     x = x - 1;
+  } else {
+    if (VERBOSE_MOVE) {
+      printf("You go east.\n");
+    }
   }
 }
 
 void go_west(void) {
   x = x - 1;
   if (w() >= threshold && z != 1) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     x = x + 1;
+  } else {
+    if (VERBOSE_MOVE) {
+      printf("You go west.\n");
+    }
   }
 }
 
 void go_up(void) {
   z = z - 1;
   if (w() >= threshold && z < 1) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     z = z + 1;
+  } else {
+    if (VERBOSE_MOVE) {
+      printf("You go up.\n");
+    }
   }
 }
 
 void go_down(void) {
   z = z + 1;
   if (w() >= threshold) {
-    printf("Impossible\n");
+    printf("You can't move in that direction.\n");
     z = z - 1;
+  } else {
+    if (VERBOSE_MOVE) {    
+      printf("You go down.\n");
+    }
   }
 }
 

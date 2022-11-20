@@ -8,7 +8,16 @@ Original concept: G.T.Relf
 
 TODO:
 
- - Prevent zero for x and y 
+ - Prevent use of zero value for x and y in random function
+ - Auto map draw
+ - help
+ - usage()
+ - sometimes there is no logical up, when there should be one - in particular at the start point
+   - earthquake trapped you nonesense
+ - add DEBUG for gold and chance (v)
+ - print level when going down or up
+ - state that you can go down when a shaft appears
+ - when you can go down underground (level 2+), there is no shaft appears message.
  
 Original code:
 

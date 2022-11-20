@@ -10,8 +10,8 @@ TODO:
 
  - Prevent use of zero value for x and y in random function
  - Auto map draw
- - help
- - usage()
+ - help - DONE
+ - usage() - DONE
  - sometimes there is no logical up, when there should be one - in particular at the start point
    - earthquake trapped you nonesense
  - add DEBUG for gold and chance (v)
@@ -230,6 +230,19 @@ void do_look(void) {
   printf("Gold pieces: %d\n", gold_pieces);
 }
 
+void do_help(void) {
+  printf("Commands: \n");
+  /*printf("\tMovement: n, s, e, w, u, d\n");*/
+  printf("\tMovement: \n\t\t\tn - North\n\t\t\ts - South\n\t\t\te - East\n\t\t\tw - West\n\t\t\tu - Up\n\t\t\td - Down\n");
+  printf("\tOther: \n\t\t\tl - Look/Inventory\n");
+  printf("\tOther: \n\t\t\th - Help\n");
+}
+
+void usage(void) {
+ printf("a.out [-d | -l | -m | -h]");
+ exit (0);
+}
+
 /* Level one functions */
 
 void set_options(int argc, char **argv) {
@@ -242,7 +255,7 @@ void set_options(int argc, char **argv) {
 
   opterr = 0;
 
-  while ((c = getopt (argc, argv, "abc:")) != -1)
+  while ((c = getopt (argc, argv, "abc:dhlm")) != -1)
     switch (c)
       {
       case 'd':
@@ -257,6 +270,9 @@ void set_options(int argc, char **argv) {
       case 'c':
         cvalue = optarg;
         break;
+      case 'h':
+        usage();
+        break;
       case '?':
         if (optopt == 'c')
           fprintf (stderr, "Option -%c requires an argument.\n", optopt);
@@ -266,8 +282,9 @@ void set_options(int argc, char **argv) {
           fprintf (stderr,
                    "Unknown option character `\\x%x'.\n",
                    optopt);
-        return 1;
+        return (1);
       default:
+        usage();
         abort ();
       }
 
@@ -388,6 +405,9 @@ void get_command(void){
     case 'l':
       do_look();
       break;
+    case 'h':
+      do_help();
+      break;
     default:
       printf("Invalid input!\n");
   }
@@ -398,7 +418,7 @@ int main(int argc, char **argv) {
   set_options(argc, argv);
 
   init();
-
+  do_help();
   /* main loop */
   do {
     current_location_attributes();

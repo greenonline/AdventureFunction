@@ -26,7 +26,8 @@ Original code:
 220 GOTO 110
 230 REM END OF MAIN LOOP
 240 REM COMPUTE ATTRIBUTES OF CURRENT LOCATION:
-250 V1=INT(W*1000)
+250 GOSUB 720
+255 V1=INT(W*1000)
 260 IF V1>35 AND V1<39 AND Z>1 THEN PRINT "HERE IS A CROCK OF GOLD!"
 270 REM (YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND!)
 280 REM INSERT OTHER ATTRIBUTE TESTS HERE.
@@ -36,11 +37,11 @@ Original code:
 320 REM IDENTIFY CORRIDORS FROM CURRENT LOCATION (CHANGES W):
 330 IF Z=1 THEN 440
 340 PRINT "CORRIDORS: "; : NC=0
-350 X=X+1: GOSUB 720 : IF W<T THEN PRINT "E" : NC=NC+1
-360 X=X-2 : GOSUB 720 : X=X+1 : IF W<T THEN PRINT "W" : NC=NC+1
-370 Y=Y+1: GOSUB 720 : IF W<T THEN PRINT "N" : NC=NC+1
-380 Y=Y-2 : GOSUB 720 : Y=Y+1 : IF W<T THEN PRINT "S" : NC=NC+1
-390 Z=Z+1: GOSUB 720 : IF W<T THEN PRINT "D" : NC=NC+1
+350 X=X+1: GOSUB 720 : IF W<T THEN PRINT "E "; : NC=NC+1
+360 X=X-2 : GOSUB 720 : X=X+1 : IF W<T THEN PRINT "W "; : NC=NC+1
+370 Y=Y+1: GOSUB 720 : IF W<T THEN PRINT "N "; : NC=NC+1
+380 Y=Y-2 : GOSUB 720 : Y=Y+1 : IF W<T THEN PRINT "S "; : NC=NC+1
+390 Z=Z+1: GOSUB 720 : IF W<T THEN PRINT "D "; : NC=NC+1
 400 Z=Z-2 : GOSUB 720 : Z=Z+1 : IF W<T OR Z=2 THEN PRINT "U" : NC=NC+1
 410 IF NC=0 THEN PRINT "NONE - THE EARTHQUAKE HAS TRAPPED YOU!"
 420 PRINT
@@ -123,60 +124,64 @@ float w() {
 
 void go_north(void) {
   y = y + 1;
-  if (w() >= threshold && z != 1) {
-    printf("You can't move in that direction.\n");
-    y = y - 1;
-  } else {
+  if (w() < threshold || z == 1) {
     if (VERBOSE_MOVE) {
       printf("You go north.\n");
     }  
+  } else {
+    printf("You can't move in that direction.\n");
+    y = y - 1;
   }
 }
 
 void go_south(void) {
   y = y - 1;
-  if (w() >= threshold && z != 1) {
-    printf("You can't move in that direction.\n");
-    y = y + 1;
-  } else {
+  if (w() < threshold || z == 1) {
     if (VERBOSE_MOVE) {
       printf("You go south.\n");
     }
+  } else {
+    printf("You can't move in that direction.\n");
+    y = y + 1;
   }
 }
 
 void go_east(void) {
   x = x + 1;
-  if (w() >= threshold && z != 1) {
-    printf("You can't move in that direction.\n");
-    x = x - 1;
-  } else {
+  if (w() < threshold || z == 1) {
     if (VERBOSE_MOVE) {
       printf("You go east.\n");
     }
+  } else {
+    printf("You can't move in that direction.\n");
+    x = x - 1;
   }
 }
 
 void go_west(void) {
   x = x - 1;
-  if (w() >= threshold && z != 1) {
-    printf("You can't move in that direction.\n");
-    x = x + 1;
-  } else {
+  if (w() < threshold || z == 1) {
     if (VERBOSE_MOVE) {
       printf("You go west.\n");
     }
+  } else {
+    printf("You can't move in that direction.\n");
+    x = x + 1;
   }
 }
 
 void go_up(void) {
-  z = z - 1;
-  if (w() >= threshold && z < 1) {
+  if (z == 1) {
     printf("You can't move in that direction.\n");
-    z = z + 1;
   } else {
-    if (VERBOSE_MOVE) {
-      printf("You go up.\n");
+    z = z - 1;
+    if (w() < threshold || z == 1) {
+      if (VERBOSE_MOVE) {
+        printf("You go up.\n");
+      }
+    } else {
+      printf("You can't move in that direction.\n");
+      z = z + 1;
     }
   }
 }
@@ -219,33 +224,33 @@ void current_location_attributes(void) {
     }
     z = z - 1;
   } else {
-    printf("Corridors:");
+    printf("Corridors: ");
     int nc = 0;
     x = x + 1;
     if (w() < threshold) {
-      printf("E");
+      printf("E ");
       nc = nc + 1;
     }
     x = x - 2;
     if (w() < threshold) {
-      printf("W");
+      printf("W ");
       nc = nc + 1;
     }
     x = x + 1;
     y = y + 1;
     if (w() < threshold) {
-      printf("N");
+      printf("N ");
       nc = nc + 1;
     }
     y = y - 2;
     if (w() < threshold) {
-      printf("S");
+      printf("S ");
       nc = nc + 1;
     }
     y = y + 1;
     z = z + 1;
     if (w() < threshold) {
-      printf("D");
+      printf("D ");
       nc = nc + 1;
     }
     z = z - 2;

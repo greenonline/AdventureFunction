@@ -188,13 +188,13 @@ void go_up(void) {
 
 void go_down(void) {
   z = z + 1;
-  if (w() >= threshold) {
-    printf("You can't move in that direction.\n");
-    z = z - 1;
-  } else {
+  if (w() < threshold) {
     if (VERBOSE_MOVE) {    
       printf("You go down.\n");
     }
+  } else {
+    printf("You can't move in that direction.\n");
+    z = z - 1;
   }
 }
 
@@ -259,10 +259,10 @@ void current_location_attributes(void) {
       nc = nc + 1;
     }
     z = z + 1;
-    printf("\n");
     if (nc == 0) {
-      printf("None - the earthquake has trapped you\n");
+      printf("None - the earthquake has trapped you.");
     }
+    printf("\n");
   }
 }
 

@@ -230,14 +230,24 @@ void do_look(void) {
   printf("Gold pieces: %d\n", gold_pieces);
 }
 
+void print_hello(void){
+  printf("Mammoth Dungeon\n");
+  printf("Version: 1.0\n");
+  printf("Ported: Greenonline\n");
+  printf("Date: 19 Nov 2022\n");
+  printf("Original concept: G.T.Relf\n");
+  printf("\n");
+
+}
 void do_help(void) {
   printf("Commands: \n");
   /*printf("\tMovement: n, s, e, w, u, d\n");*/
   printf("\tMovement: \n\t\t\tn - North\n\t\t\ts - South\n\t\t\te - East\n\t\t\tw - West\n\t\t\tu - Up\n\t\t\td - Down\n");
   printf("\tOther: \n\t\t\tl - Look/Inventory\n");
-  printf("\n\t\t\th - Help\n");
-  printf("\n\t\t\tv - Verbose\n");
-  printf("\n\t\t\tx - Debug\n");
+  printf("\t\t\th - Help\n");
+  printf("\t\t\tv - Verbose\n");
+  printf("\t\t\tx - Debug\n");
+  printf("\n");
 }
 
 void usage(void) {
@@ -414,7 +424,9 @@ void get_command(void){
  /* or */
  /*scanf("%c", &command);*/
  /*getchar();*/
- switch (command) {
+ /* https://stackoverflow.com/questions/60624380/multiple-chars-in-switch-case-in-c */
+ /*switch (command) {*/
+ switch( tolower( ( unsigned char ) command ) ) {
     case 'n':
       go_north();
       break;
@@ -455,6 +467,7 @@ int main(int argc, char **argv) {
   set_options(argc, argv);
 
   init();
+  print_hello();
   do_help();
   /* main loop */
   do {

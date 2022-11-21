@@ -235,7 +235,9 @@ void do_help(void) {
   /*printf("\tMovement: n, s, e, w, u, d\n");*/
   printf("\tMovement: \n\t\t\tn - North\n\t\t\ts - South\n\t\t\te - East\n\t\t\tw - West\n\t\t\tu - Up\n\t\t\td - Down\n");
   printf("\tOther: \n\t\t\tl - Look/Inventory\n");
-  printf("\tOther: \n\t\t\th - Help\n");
+  printf("\n\t\t\th - Help\n");
+  printf("\n\t\t\tv - Verbose\n");
+  printf("\n\t\t\tx - Debug\n");
 }
 
 void usage(void) {
@@ -245,13 +247,23 @@ void usage(void) {
 
 void toggle_debug(){
   DEBUG=1-DEBUG;
-  printf("DEBUG mode on\n");
+  printf("DEBUG mode ");
+  if (DEBUG){
+    printf("on\n");
+  } else {
+    printf("off\n");
+  }
 }
 
 void toggle_verbose(){
   VERBOSE_MOVE=1-VERBOSE_MOVE;
   VERBOSE_LOCATION=1-VERBOSE_LOCATION;
-  printf("VERBOSE mode on\n");
+  printf("VERBOSE mode ");
+  if (VERBOSE_LOCATION){
+    printf("on\n");
+  } else {
+    printf("off\n");
+  }
 
 }
 

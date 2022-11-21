@@ -239,8 +239,24 @@ void do_help(void) {
 }
 
 void usage(void) {
- printf("a.out [-d | -l | -m | -h]");
- exit (0);
+  printf("a.out [-d | -l | -m | -h]");
+  exit (0);
+}
+
+void toggle_debug(){
+  DEBUG=1-DEBUG;
+  printf("DEBUG mode on\n");
+}
+
+void toggle_verbose(){
+  VERBOSE_MOVE=1-VERBOSE_MOVE;
+  VERBOSE_LOCATION=1-VERBOSE_LOCATION;
+  printf("VERBOSE mode on\n");
+
+}
+
+void set_debug(){
+  toggle_debug();
 }
 
 /* Level one functions */
@@ -300,6 +316,9 @@ void init(void) {
 
 void current_location_attributes(void) {
   int v = (int)(w() * 1000);
+  if (DEBUG){
+    printf("DEBUG: v=%d\n",v);
+  }
   if (v > 35 && v < 39 && z > 1) {
     printf("HERE IS A CROCK OF GOLD!");
     /* YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND! */
@@ -407,6 +426,12 @@ void get_command(void){
       break;
     case 'h':
       do_help();
+      break;
+    case 'v':
+      toggle_verbose();
+      break;
+    case 'x':
+      toggle_debug();
       break;
     default:
       printf("Invalid input!\n");

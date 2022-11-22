@@ -135,6 +135,12 @@ float randomFloat() {
   return r;
 }
 
+/* https://stackoverflow.com/questions/30220691/how-to-get-empty-input-or-only-enter-in-c */
+/* https://stackoverflow.com/questions/2187474/i-am-not-able-to-flush-stdin-how-can-i-flush-stdin-in-c */
+/* simple function to strip '\n` from stdin */
+void fflush_stdin()
+{ int c; while ((c = getchar()) != '\n' && c != EOF); }
+
 float location_random() {
   if (DEBUG) {
     printf("DEBUG: multi= %d\n", x * x + y * y * z);
@@ -460,6 +466,7 @@ void get_command(void){
     default:
       printf("Invalid input!\n");
   }
+ fflush_stdin();
 }
 
 int main(int argc, char **argv) {

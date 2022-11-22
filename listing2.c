@@ -254,7 +254,8 @@ void current_location_attributes(void) {
       nc = nc + 1;
     }
     z = z - 2;
-    if (w() < threshold || z == 2) {
+    /*if (w() < threshold || z == 2) {*/ /* Original line, fails due to z-2 */
+    if (w() < threshold || z+1 == 2) {
       printf("U");
       nc = nc + 1;
     }

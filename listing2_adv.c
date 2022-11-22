@@ -408,11 +408,29 @@ void current_location_attributes(void) {
       nc = nc + 1;
     }
     z = z - 2;
-    if (w() < threshold || z == 2) {
+    /* 
+     * There will always be an up on this z+1 == 2 condition,
+     * even if there isn't a shaft at ground level, 
+     * won't there? I am not sure ...
+     */
+    /*if (w() < threshold || z == 2) {*/ /* Original line, fails due to z-2 */
+    if (w() < threshold || z+1 == 2) {
+    /*if (w() < threshold) {*/
       printf("U");
       nc = nc + 1;
     }
     z = z + 1;
+    /* 
+     * There will always be an up on this z+1 == 2 condition,
+     * even if there isn't a shaft at ground level, 
+     * won't there? I am not sure ...
+     *
+     * Also, you can get two U if also w<T
+     */
+    /*if (z == 2) {
+      printf("U");
+      nc = nc + 1;
+    }*/
     if (nc == 0) {
       printf("None - the earthquake has trapped you.");
     }

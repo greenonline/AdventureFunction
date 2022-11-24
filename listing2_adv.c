@@ -17,7 +17,12 @@ TODO:
  - add DEBUG for gold and chance (v)
  - print level when going down or up
  - state that you can go down when a shaft appears
- - when you can go down underground (level 2+), there is no shaft appears message.
+ - when you can go down underground (level 2+), there is no shaft appears message (as designed?).
+ - Maybe start ground level as Z=2? Would this resolve the strange behaviour of downward shafts 
+      actually being in sequence and therefore effectively a ravine on the ground?
+   - Further still, ground level should be 2, to prevent (when underground) z-1==1 in the sqrt function, which does nothing useful
+   - Also, should x and y be prevented from being less than 3 as the (x,y)-1==1 in the sqrt function is not useful
+ 
  
 Original code:
 
@@ -117,6 +122,11 @@ float threshold;
 int crocks;
 int gold_pieces;
 
+/*const int k_axis_min = 2; */ /* applies to x,y and z - For z this is ground level */
+/*const int k_ground_level = k_axis_min;*/
+#define k_axis_min 2
+#define k_ground_level k_axis_min
+
 int DEBUG = 0;
 int VERBOSE_MOVE = 0;
 int VERBOSE_LOCATION = 0;
@@ -156,7 +166,8 @@ float w() {
 
 void go_north(void) {
   y = y + 1;
-  if (w() < threshold || z == 1) {
+  /*if (w() < threshold || z == 1) {*/
+  if (w() < threshold || z == k_ground_level) {
     if (VERBOSE_MOVE) {
       printf("You go north.\n");
     }  
@@ -168,7 +179,8 @@ void go_north(void) {
 
 void go_south(void) {
   y = y - 1;
-  if (w() < threshold || z == 1) {
+  /*if (w() < threshold || z == 1) {*/
+  if (w() < threshold || z == k_ground_level) {
     if (VERBOSE_MOVE) {
       printf("You go south.\n");
     }
@@ -180,7 +192,8 @@ void go_south(void) {
 
 void go_east(void) {
   x = x + 1;
-  if (w() < threshold || z == 1) {
+  /*if (w() < threshold || z == 1) {*/
+  if (w() < threshold || z == k_ground_level) {
     if (VERBOSE_MOVE) {
       printf("You go east.\n");
     }
@@ -192,7 +205,8 @@ void go_east(void) {
 
 void go_west(void) {
   x = x - 1;
-  if (w() < threshold || z == 1) {
+  /*if (w() < threshold || z == 1) {*/
+  if (w() < threshold || z == k_ground_level) {
     if (VERBOSE_MOVE) {
       printf("You go west.\n");
     }
@@ -203,11 +217,13 @@ void go_west(void) {
 }
 
 void go_up(void) {
-  if (z == 1) {
+  /*if (z == 1) {*/
+  if (z == k_ground_level) {
     printf("You can't move in that direction.\n");
   } else {
     z = z - 1;
-    if (w() < threshold || z == 1) {
+    /* if (w() < threshold || z == 1) {*/ /*the z==1 makes no sense, if implies that if at level 2 you can always go up */
+    if (w() < threshold || z == k_ground_level) { /*the z==1 makes no sense, if implies that if at level 2 you can always go up */
       if (VERBOSE_MOVE) {
         printf("You go up.\n");
       }
@@ -251,6 +267,7 @@ void do_help(void) {
   printf("\tMovement: \n\t\t\tn - North\n\t\t\ts - South\n\t\t\te - East\n\t\t\tw - West\n\t\t\tu - Up\n\t\t\td - Down\n");
   printf("\tOther: \n\t\t\tl - Look/Inventory\n");
   printf("\t\t\th - Help\n");
+  printf("\t\t\tq - Quit\n");
   printf("\t\t\tv - Verbose\n");
   printf("\t\t\tx - Debug\n");
   printf("\n");
@@ -289,7 +306,7 @@ void set_debug(){
 
 /* Level one functions */
 
-void set_options(int argc, char **argv) {
+int set_options(int argc, char **argv) {
   /* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html */
   int aflag = 0;
   int bflag = 0;
@@ -299,7 +316,7 @@ void set_options(int argc, char **argv) {
 
   opterr = 0;
 
-  while ((c = getopt (argc, argv, "abc:dhlm")) != -1)
+  while ((c = getopt (argc, argv, "c:dhlm")) != -1)
     switch (c)
       {
       case 'd':
@@ -324,8 +341,7 @@ void set_options(int argc, char **argv) {
           fprintf (stderr, "Unknown option `-%c'.\n", optopt);
         else
           fprintf (stderr,
-                   "Unknown option character `\\x%x'.\n",
-                   optopt);
+                   "Unknown option character `\\x%x'.\n", optopt);
         return (1);
       default:
         usage();
@@ -335,7 +351,8 @@ void set_options(int argc, char **argv) {
 }
 
 void init(void) {
-  x = 103, y = 97, z = 1;
+  /*x = 103, y = 97, z = 1;*/
+  x = 103, y = 97, z = k_ground_level;
   threshold = 0.3;
   crocks = 0;
   gold_pieces = 0;
@@ -368,7 +385,8 @@ void current_location_attributes(void) {
   if (VERBOSE_LOCATION){
     printf("%d_%d_%d - ",x,y,z);
   }
-  if (z == 1) {
+  /*if (z == 1) {*/
+  if (z == k_ground_level) {
     printf("Ground level - ");
     z = z + 1;
     if (w() < threshold) {
@@ -414,7 +432,8 @@ void current_location_attributes(void) {
      * won't there? I am not sure ...
      */
     /*if (w() < threshold || z == 2) {*/ /* Original line, fails due to z-2 */
-    if (w() < threshold || z+1 == 2) {
+    /*if (w() < threshold || z+1 == 2) {*/ /* Fixed z-2 issue */
+    if (w() < threshold || z+1 == k_ground_level+1) { /* Fixes ground level starts at z==2 */
     /*if (w() < threshold) {*/
       printf("U");
       nc = nc + 1;
@@ -475,6 +494,8 @@ void get_command(void){
     case 'h':
       do_help();
       break;
+    case 'q':
+      exit(0);
     case 'v':
       toggle_verbose();
       break;

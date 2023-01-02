@@ -7,7 +7,7 @@ From an article, **Repeatable functions for limitless mazes** by *G.T.Relf*, in 
 
  - Listing 1: Code example using cosine to generate random numbers
  - Listing 2: **Mammoth Maze**
-   - Note: In the published listing, there is an omission, at line 250, to call the random number generator. This is fixed in `LISTING2_FIXED.BAS`.
+   - Note: In the published listing, there is an omission, at line 250, to call the random number generator. This is fixed in `LISTING2_FIXED.BAS`, by: moving line 250 to 255, and; adding lines 245 (REM) and 250 (GOSUB).
 
 ## Scans
 

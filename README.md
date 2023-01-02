@@ -1,21 +1,25 @@
 # AdventureFunction
 Procedural Dungeon Map
 
-From an article, **Repeatable functions for limitless mazes** by *G.T.Relf*, in [Practical Computing March 1982][1], page 93
+From an article, **Repeatable functions for limitless mazes** by *G.T.Relf*, in [Practical Computing - March 1982][1], page 93
 
-Listing 1: Code example using cosine to generate random numbers
+## Listings
 
-Listing 2: **Mammoth Maze**
+ - Listing 1: Code example using cosine to generate random numbers
+ - Listing 2: **Mammoth Maze**
+   - Note: In the published listing, there is an omission, at line 250, to call the random number generator. This is fixed in `LISTING2_FIXED.BAS`.
 
-Note: There is an omission, in the published listing, at line 250 to call the random number generator. This is fixed in `LISTING1_FIXED.BAS`.
+## Scans
 
 [![Practical Computing, March 1982 - page 93][2]][2]
 
 [![Practical Computing, March 1982 - page 95][3]][3]
 
-See also [Early 1982 PCW article about pseudo random dungeon mapping][4]
+See also this question on SE.Retrocomputing: [Early 1982 PCW article about pseudo random dungeon mapping][4]
 
-Additional code, **Labyrinth** by *P.J.Goss*:
+### Additional code
+
+**Labyrinth** by *P.J.Goss*:
 
 [![Practical Computing, March 1982 - page 97][11]][11]
 

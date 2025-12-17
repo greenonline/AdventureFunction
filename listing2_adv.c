@@ -6,6 +6,12 @@ Ported: Greenonline
 Date: 19 Nov 2022
 Original concept: G.T.Relf
 
+Differences from the "non-advanced" version include:
+
+ - Adds crocks and gold pieces
+ - Adds fflush_stdin()
+ - Adds k_ground_level
+
 TODO:
 
  - Prevent use of zero value for x and y in random function
@@ -459,17 +465,17 @@ void current_location_attributes(void) {
 }
 
 void get_command(void){
- char command;
+  char command;
 
- printf("Enter a direction: ");
- /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
- scanf(" %c", &command);
- /* or */
- /*scanf("%c", &command);*/
- /*getchar();*/
- /* https://stackoverflow.com/questions/60624380/multiple-chars-in-switch-case-in-c */
- /*switch (command) {*/
- switch( tolower( ( unsigned char ) command ) ) {
+  printf("Enter a direction: ");
+  /* https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
+  scanf(" %c", &command);
+  /* or */
+  /*scanf("%c", &command);*/
+  /*getchar();*/
+  /* https://stackoverflow.com/questions/60624380/multiple-chars-in-switch-case-in-c */
+  /*switch (command) {*/
+  switch( tolower( ( unsigned char ) command ) ) {
     case 'n':
       go_north();
       break;
@@ -505,7 +511,7 @@ void get_command(void){
     default:
       printf("Invalid input!\n");
   }
- fflush_stdin();
+  fflush_stdin();
 }
 
 int main(int argc, char **argv) {

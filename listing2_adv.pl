@@ -12,29 +12,35 @@ Ported: Greenonline
 Date: 19 Nov 2022
 Original concept: G.T.Relf
 
+Differences from the "non-advanced" version include:
+
+ - Adds crocks and gold pieces
+ - Adds fflush_stdin()
+ - Adds k_ground_level
+
 TODO:
 
- - Prevent use of $zero value for $x and $y in random function
+ - Prevent use of zero value for x and y in random function
  - Auto map draw
  - help - DONE
  - usage() - DONE
  - sometimes there is no logical up, when there should be one - in particular at the start point
    - earthquake trapped you nonesense
- - add $flg_debug for gold and chance (v)
+ - add DEBUG for gold and chance (v)
  - print level when going down or up
  - state that you can go down when a shaft appears
  - when you can go down underground (level 2+), there is no shaft appears message (as designed?).
- - Maybe start ground level as $z=2? Would this resolve the strange behaviour of downward shafts 
+ - Maybe start ground level as Z=2? Would this resolve the strange behaviour of downward shafts 
       actually being in sequence and therefore effectively a ravine on the ground?
-   - Further still, ground level should be 2, to prevent (when underground) $z-1==1 in the sqrt function, which does nothing useful
-   - Also, should $x and $y be prevented from being less than 3 as the (x,y)-1==1 in the sqrt function is not useful
+   - Further still, ground level should be 2, to prevent (when underground) z-1==1 in the sqrt function, which does nothing useful
+   - Also, should x and y be prevented from being less than 3 as the (x,y)-1==1 in the sqrt function is not useful
  
  
 Original code:
 
 10 PRINT "MAMMOTH MAZE in 2.5K BYTES BY G.T.RELF"
 20 REM SET STARTING POSITION (EAST, WEST, DOWN):
-30 $x=103 : $y=97 : $z=1
+30 X=103 : Y=97 : Z=1
 40 REM SET THREASHOLD
 50 T=0.3
 60 REM RANDOMIZE FOR EARTHQUAKES
@@ -58,52 +64,52 @@ Original code:
 240 REM COMPUTE ATTRIBUTES OF CURRENT LOCATION:
 250 GOSUB 720
 255 V1=INT(W*1000)
-260 IF V1>35 AND V1<39 AND $z>1 THEN PRINT "HERE IS A CROCK OF GOLD!"
+260 IF V1>35 AND V1<39 AND Z>1 THEN PRINT "HERE IS A CROCK OF GOLD!"
 270 REM (YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND!)
 280 REM INSERT OTHER ATTRIBUTE TESTS HERE.
 290 REM CHECK FOR EARTHQUAKES:
 300 IF RND(1000)=9 THEN PRINT "RUMBLE, RUMBLE..." : T=T+0.2*RND(0)-0.1
 310 REM INSERT OTHER LOCATION-DEPENDANT TESTS HERE.
 320 REM IDENTIFY CORRIDORS FROM CURRENT LOCATION (CHANGES W):
-330 IF $z=1 THEN 440
-340 PRINT "CORRIDORS: "; : $nc=0
-350 $x=X+1: GOSUB 720 : IF W<T THEN PRINT "E "; : $nc=NC+1
-360 $x=X-2 : GOSUB 720 : $x=X+1 : IF W<T THEN PRINT "W "; : $nc=NC+1
-370 $y=Y+1: GOSUB 720 : IF W<T THEN PRINT "N "; : $nc=NC+1
-380 $y=Y-2 : GOSUB 720 : $y=Y+1 : IF W<T THEN PRINT "S "; : $nc=NC+1
-390 $z=Z+1: GOSUB 720 : IF W<T THEN PRINT "D "; : $nc=NC+1
-400 $z=Z-2 : GOSUB 720 : $z=Z+1 : IF W<T OR $z=2 THEN PRINT "U" : $nc=NC+1
-410 IF $nc=0 THEN PRINT "NONE - THE EARTHQUAKE HAS TRAPPED you!"
+330 IF Z=1 THEN 440
+340 PRINT "CORRIDORS: "; : NC=0
+350 X=X+1: GOSUB 720 : IF W<T THEN PRINT "E "; : NC=NC+1
+360 X=X-2 : GOSUB 720 : X=X+1 : IF W<T THEN PRINT "W "; : NC=NC+1
+370 Y=Y+1: GOSUB 720 : IF W<T THEN PRINT "N "; : NC=NC+1
+380 Y=Y-2 : GOSUB 720 : Y=Y+1 : IF W<T THEN PRINT "S "; : NC=NC+1
+390 Z=Z+1: GOSUB 720 : IF W<T THEN PRINT "D "; : NC=NC+1
+400 Z=Z-2 : GOSUB 720 : Z=Z+1 : IF W<T OR Z=2 THEN PRINT "U" : NC=NC+1
+410 IF NC=0 THEN PRINT "NONE - THE EARTHQUAKE HAS TRAPPED YOU!"
 420 PRINT
 430 RETURN
 440 PRINT "GROUND LEVEL."
-450 $z=Z+1 : GOSUB 720 : $z=Z-1
+450 Z=Z+1 : GOSUB 720 : Z=Z-1
 460 IF W<T THEN PRINT "A SHAFT DESCENDS FROM HERE."
 470 RETURN
 480 REM MOVE NORTH:
-490 $y=Y+1 : IF $z=1 THEN 110
+490 Y=Y+1 : IF Z=1 THEN 110
 500 GOSUB 720 : IF W<T THEN 110
-510 $y=Y-1 : GOTO 210
+510 Y=Y-1 : GOTO 210
 520 REM MOVE EAST:
-530 $x=X+1 : IF $z=1 THEN 110
+530 X=X+1 : IF Z=1 THEN 110
 540 GOSUB 720 : IF W<T THEN 110
-550 $x=X-1 : GOTO 210
+550 X=X-1 : GOTO 210
 560 REM MOVE WEST:
-570 $x=X-1 : IF $z=1 THEN 110
+570 X=X-1 : IF Z=1 THEN 110
 580 GOSUB 720 : IF W<T THEN 110
-590 $x=X+1 : GOTO 210
+590 X=X+1 : GOTO 210
 600 REM MOVE SOUTH:
-610 $y=Y-1 : IF $z=1 THEN 110
+610 Y=Y-1 : IF Z=1 THEN 110
 620 GOSUB 720 : IF W<T THEN 110
-630 $y=Y+1 : GOTO 210
+630 Y=Y+1 : GOTO 210
 640 REM MOVE UP:
-650 IF $z=1 THEN 210
-655 $z=Z-1 : IF $z=1 THEN 110
+650 IF Z=1 THEN 210
+655 Z=Z-1 : IF Z=1 THEN 110
 660 GOSUB 720 : IF W<T THEN 110
-670 $z=Z+1 : GOTO 210
+670 Z=Z+1 : GOTO 210
 680 REM MOVE DOWN:
-690 $z=Z+1 : GOSUB 720 : IF W<T THEN 110
-700 $z=Z-1 : GOTO 210 
+690 Z=Z+1 : GOSUB 720 : IF W<T THEN 110
+700 Z=Z-1 : GOTO 210 
 710 REM RANDOM FUNCTION
 720 U=U*100*SQR(X*X+Y*Y*Z)
 730 W=U-INT(U)
@@ -571,15 +577,11 @@ sub get_command{
   my $command;
 
   print("Enter a direction: ");
-  # https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
-  #scanf(" %c", &command);
+  # [How to get input from the terminal in Perl]
+  #       (https://stackoverflow.com/q/41950624/4424636)
   $command = <STDIN>;
   chomp $command;
-  # or 
-  #scanf("%c", &command);*/
-  #getchar();*/
-  # https://stackoverflow.com/questions/60624380/multiple-chars-in-switch-case-in-c */
-  #switch ($command) {*/
+
   $command = lc $command;
   print "Command: $command\n" if $flg_debug;
 

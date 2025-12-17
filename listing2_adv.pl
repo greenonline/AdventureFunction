@@ -1,0 +1,648 @@
+#!/usr/bin/perl
+# Mammoth Advanced in Perl
+# Ported from listing2_adv.c
+
+=pod
+
+/******************************************************************************
+
+Name: Mammoth Maze Advanced
+Version: 1.0
+Ported: Greenonline
+Date: 19 Nov 2022
+Original concept: G.T.Relf
+
+TODO:
+
+ - Prevent use of $zero value for $x and $y in random function
+ - Auto map draw
+ - help - DONE
+ - usage() - DONE
+ - sometimes there is no logical up, when there should be one - in particular at the start point
+   - earthquake trapped you nonesense
+ - add $flg_debug for gold and chance (v)
+ - print level when going down or up
+ - state that you can go down when a shaft appears
+ - when you can go down underground (level 2+), there is no shaft appears message (as designed?).
+ - Maybe start ground level as $z=2? Would this resolve the strange behaviour of downward shafts 
+      actually being in sequence and therefore effectively a ravine on the ground?
+   - Further still, ground level should be 2, to prevent (when underground) $z-1==1 in the sqrt function, which does nothing useful
+   - Also, should $x and $y be prevented from being less than 3 as the (x,y)-1==1 in the sqrt function is not useful
+ 
+ 
+Original code:
+
+10 PRINT "MAMMOTH MAZE in 2.5K BYTES BY G.T.RELF"
+20 REM SET STARTING POSITION (EAST, WEST, DOWN):
+30 $x=103 : $y=97 : $z=1
+40 REM SET THREASHOLD
+50 T=0.3
+60 REM RANDOMIZE FOR EARTHQUAKES
+70 RANDOM
+80 REM INSERT ANY OTHER INITIALISING STATEMENTS HERE.
+90 REM MAIN LOOP:
+100 REM COMPUTE PROPERTIES OF CURRENT LOCATION
+110 GOSUB 250
+120 REM GET COMMAND & BRANCH ACCORDINGLY:
+130 INPUT "COMMAND"; CM$
+140 CM$=LEFT(CM$,1)
+150 IF CM$="N" THEN 490
+160 IF CM$="E" THEN 530
+170 IF CM$="W" THEN 570
+180 IF CM$="S" THEN 610
+190 IF CM$="U" THEN 650
+200 IF CM$="D" THEN 690
+210 PRINT "IMPOSSIBLE!"
+220 GOTO 110
+230 REM END OF MAIN LOOP
+240 REM COMPUTE ATTRIBUTES OF CURRENT LOCATION:
+250 GOSUB 720
+255 V1=INT(W*1000)
+260 IF V1>35 AND V1<39 AND $z>1 THEN PRINT "HERE IS A CROCK OF GOLD!"
+270 REM (YOU WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND!)
+280 REM INSERT OTHER ATTRIBUTE TESTS HERE.
+290 REM CHECK FOR EARTHQUAKES:
+300 IF RND(1000)=9 THEN PRINT "RUMBLE, RUMBLE..." : T=T+0.2*RND(0)-0.1
+310 REM INSERT OTHER LOCATION-DEPENDANT TESTS HERE.
+320 REM IDENTIFY CORRIDORS FROM CURRENT LOCATION (CHANGES W):
+330 IF $z=1 THEN 440
+340 PRINT "CORRIDORS: "; : $nc=0
+350 $x=X+1: GOSUB 720 : IF W<T THEN PRINT "E "; : $nc=NC+1
+360 $x=X-2 : GOSUB 720 : $x=X+1 : IF W<T THEN PRINT "W "; : $nc=NC+1
+370 $y=Y+1: GOSUB 720 : IF W<T THEN PRINT "N "; : $nc=NC+1
+380 $y=Y-2 : GOSUB 720 : $y=Y+1 : IF W<T THEN PRINT "S "; : $nc=NC+1
+390 $z=Z+1: GOSUB 720 : IF W<T THEN PRINT "D "; : $nc=NC+1
+400 $z=Z-2 : GOSUB 720 : $z=Z+1 : IF W<T OR $z=2 THEN PRINT "U" : $nc=NC+1
+410 IF $nc=0 THEN PRINT "NONE - THE EARTHQUAKE HAS TRAPPED you!"
+420 PRINT
+430 RETURN
+440 PRINT "GROUND LEVEL."
+450 $z=Z+1 : GOSUB 720 : $z=Z-1
+460 IF W<T THEN PRINT "A SHAFT DESCENDS FROM HERE."
+470 RETURN
+480 REM MOVE NORTH:
+490 $y=Y+1 : IF $z=1 THEN 110
+500 GOSUB 720 : IF W<T THEN 110
+510 $y=Y-1 : GOTO 210
+520 REM MOVE EAST:
+530 $x=X+1 : IF $z=1 THEN 110
+540 GOSUB 720 : IF W<T THEN 110
+550 $x=X-1 : GOTO 210
+560 REM MOVE WEST:
+570 $x=X-1 : IF $z=1 THEN 110
+580 GOSUB 720 : IF W<T THEN 110
+590 $x=X+1 : GOTO 210
+600 REM MOVE SOUTH:
+610 $y=Y-1 : IF $z=1 THEN 110
+620 GOSUB 720 : IF W<T THEN 110
+630 $y=Y+1 : GOTO 210
+640 REM MOVE UP:
+650 IF $z=1 THEN 210
+655 $z=Z-1 : IF $z=1 THEN 110
+660 GOSUB 720 : IF W<T THEN 110
+670 $z=Z+1 : GOTO 210
+680 REM MOVE DOWN:
+690 $z=Z+1 : GOSUB 720 : IF W<T THEN 110
+700 $z=Z-1 : GOTO 210 
+710 REM RANDOM FUNCTION
+720 U=U*100*SQR(X*X+Y*Y*Z)
+730 W=U-INT(U)
+740 RETURN
+*******************************************************************************/
+
+=cut
+
+#
+# Use
+#
+
+use strict;
+use warnings;
+use Getopt::Std;
+
+#
+# Flags
+#
+
+my $flg_cvalue = 0;
+my $flg_debug = 0;
+my $flg_quiet = 0;
+my $flg_verbose_location = 0;
+my $flg_verbose_move = 0;
+
+#
+# Variables
+#
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#/* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html */
+#include <ctype.h>
+#include <unistd.h>
+
+
+#int $x=103,$y=97,$z=1;
+#int $threashold=0.3;
+#
+# int $w;
+my $x;
+my $y;
+my $z;
+my $threshold;
+my $crocks;
+my $gold_pieces;
+
+# const int k_axis_min = 2; */ /* applies to $x,y and $z - For $z this is ground level 
+# const int $k_ground_level = k_axis_min;*/
+
+#define k_axis_min 2
+#define $k_ground_level k_axis_min
+my $k_axis_min = 2;
+my $k_ground_level = $k_axis_min;
+
+
+sub set_random_seed {
+  srand(0);
+  #/* https://stackoverflow.com/questions/1694827/random-float-number */
+  #/* https://stackoverflow.com/questions/822323/how-to-generate-a-random-int-in-c */
+  #/*srand(time(NULL));*/
+}
+
+# Generate a float between 0 and 1
+# https://stackoverflow.com/questions/1694827/random-float-number
+# returns float
+sub randomFloat {
+  #my $r = (float) rand() / (float) RAND_MAX;
+  #return $r;
+
+  my $minimum = 1;
+  my $maximum = 65535;
+  $maximum++;  # Add one to make inclusive
+  return ($minimum + int(rand($maximum - $minimum)))/$maximum;
+}
+
+# https://stackoverflow.com/questions/30220691/how-to-get-empty-input-or-only-enter-in-c 
+# https://stackoverflow.com/questions/2187474/i-am-not-able-to-flush-stdin-how-can-i-flush-stdin-in-c
+# simple function to strip '\n` from stdin
+# Not needed(???) - Use chomp for Perl?
+#void fflush_stdin()
+#{ int c; while ((c = getchar()) != '\n' && c != EOF); }
+
+# returns float
+sub location_random {
+  if ($flg_debug) {
+    print("$flg_debug: multi= %d\n", $x * $x + $y * $y * $z);
+    print("$flg_debug: sqrt= %f\n", sqrt($x * $x + $y * $y * $z));
+  }
+  my $u = 100 * sqrt($x * $x + $y * $y * $z);
+  return ($u - int($u));
+}
+
+# returns float
+sub w {
+  return (location_random());
+}
+
+sub go_north {
+  $y = $y + 1;
+  #/*if (w() < $threshold || $z == 1) {*/
+  if (w() < $threshold || $z == $k_ground_level) {
+    if ($flg_verbose_move) {
+      print("You go north.\n");
+    }  
+  } else {
+    print("You can't move in that direction.\n");
+    $y = $y - 1;
+  }
+}
+
+sub go_south {
+  $y = $y - 1;
+  #/*if (w() < $threshold || $z == 1) {*/
+  if (w() < $threshold || $z == $k_ground_level) {
+    if ($flg_verbose_move) {
+      print("You go south.\n");
+    }
+  } else {
+    print("You can't move in that direction.\n");
+    $y = $y + 1;
+  }
+}
+
+sub go_east {
+  $x = $x + 1;
+  #/*if (w() < $threshold || $z == 1) {*/
+  if (w() < $threshold || $z == $k_ground_level) {
+    if ($flg_verbose_move) {
+      print("You go east.\n");
+    }
+  } else {
+    print("You can't move in that direction.\n");
+    $x = $x - 1;
+  }
+}
+
+sub go_west {
+  $x = $x - 1;
+  #/*if (w() < $threshold || $z == 1) {*/
+  if (w() < $threshold || $z == $k_ground_level) {
+    if ($flg_verbose_move) {
+      print("You go west.\n");
+    }
+  } else {
+    print("You can't move in that direction.\n");
+    $x = $x + 1;
+  }
+}
+
+sub go_up {
+  #/*if (z == 1) {*/
+  if ($z == $k_ground_level) {
+    print("You can't move in that direction.\n");
+  } else {
+    $z = $z - 1;
+    #/* if (w() < $threshold || $z == 1) {*/ #the $z==1 makes no sense, if implies that if at level 2 you can always go up */
+    if (w() < $threshold || $z == $k_ground_level) { #the $z==1 makes no sense, if implies that if at level 2 you can always go up */
+      if ($flg_verbose_move) {
+        print("You go up.\n");
+      }
+    } else {
+      print("You can't move in that direction.\n");
+      $z = $z + 1;
+    }
+  }
+}
+
+sub go_down {
+  $z = $z + 1;
+  if (w() < $threshold) {
+    if ($flg_verbose_move) {    
+      print("You go down.\n");
+    }
+  } else {
+    print("You can't move in that direction.\n");
+    $z = $z - 1;
+  }
+}
+
+sub do_look {
+  print("Location: $x, $y, $z\n");
+  print("Crocks: $crocks\n");
+  print("Gold pieces: $gold_pieces\n");
+}
+
+sub print_hello{
+  print("Mammoth Dungeon\n");
+  print("Version: 1.0\n");
+  print("Ported: Greenonline\n");
+  print("Date: 19 Nov 2022\n");
+  print("Original concept: G.T.Relf\n");
+  print("\n");
+
+}
+
+sub do_help {
+  print("Commands: \n");
+  #/*print("\tMovement: n, s, e, w, u, d\n");*/
+  print("\tMovement: \n\t\t\tn - North\n\t\t\ts - South\n\t\t\te - East\n\t\t\tw - West\n\t\t\tu - Up\n\t\t\td - Down\n");
+  print("\tOther: \n\t\t\tl - Look/Inventory\n");
+  print("\t\t\th - Help\n");
+  print("\t\t\tq - Quit\n");
+  print("\t\t\tv - Verbose\n");
+  print("\t\t\tx - $flg_debug\n");
+  print("\n");
+}
+
+sub usage {
+  print("a.out [-d | -l | -m | -h]");
+  exit (0);
+}
+
+sub toggle_flg_debug{
+  $flg_debug=1-$flg_debug;
+  print("$flg_debug mode ");
+  if ($flg_debug){
+    print("on\n");
+  } else {
+    print("off\n");
+  }
+}
+
+sub toggle_verbose{
+  $flg_verbose_move=1-$flg_verbose_move;
+  $flg_verbose_location=1-$flg_verbose_location;
+  print("VERBOSE mode ");
+  if ($flg_verbose_location){
+    print("on\n");
+  } else {
+    print("off\n");
+  }
+
+}
+
+sub set_flg_debug{
+  toggle_flg_debug();
+}
+
+#/* Level one functions */
+
+=pod
+
+# Returns int
+sub set_options(int argc, char **argv) {
+  #/* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html */
+  my $aflag = 0;
+  my $bflag = 0;
+  char *cvalue = NULL;
+  my $index;
+  my $c;
+
+  opterr = 0;
+use Switch;
+  while (($c = getopt (argc, argv, "c:dhlm")) != -1)
+    switch ($c)
+      {
+      case 'd'{
+        $flg_debug = 1;
+
+        break;
+      }
+      case 'l'{
+        $flg_verbose_location = 1;
+        break;
+      }
+      case 'm'{
+        $flg_verbose_move = 1;
+        break;
+      }
+      case 'c'{
+        cvalue = optarg;
+        break;
+      }
+      case 'h'{
+        usage();
+        break;
+      }
+      case '?'{
+        if (optopt == 'c')
+          fprint (stderr, "Option -%c requires an argument.\n", optopt);
+        else if (isprint (optopt))
+          fprint (stderr, "Unknown option `-%c'.\n", optopt);
+        else
+          fprint (stderr,
+                   "Unknown option character `\\x%x'.\n", optopt);
+        return (1);
+      }
+      else{
+        usage();
+        abort ();
+      }
+      }
+
+}
+
+=cut
+
+#
+# Getopt stuff (start)
+#
+
+my $VERSION = "0.9";
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+sub HELP_MESSAGE{
+  print "\nHelp:\n";
+  # Removed for Getopt filename stuff
+  #print "        $0 [abcdefghijklmnopqrstruvwxyz] [help] <action> <object> [adjective] [<filename>]\n\n";
+  # Getopt filename stuff
+  print "        $0 [<->c:dhlm] <action> <object> [adjective]\n\n";
+  print "             -c               - cvalue???\n";
+  print "             -d               - debug\n";
+  print "             -h               - help\n";
+  print "             -l               - verbose location\n"; # Getopt filename stuff
+  print "             -m               - verbose move\n\n";
+
+  exit;
+}
+
+sub VERSION_MESSAGE{
+  print "Mammoth Maze, version $VERSION\n";
+
+  #exit;  # help calls version, so if you exit here, then no help is printed!
+}
+
+our ($opt_c, $opt_d, $opt_h, $opt_l, $opt_m);
+
+getopts('c:dhlm'); 
+
+
+# Moved to sub HELP_MESSAGE()
+if ($opt_h){
+  HELP_MESSAGE();
+}
+
+
+$flg_cvalue=$opt_c             if $opt_c;
+$flg_debug=$opt_d              if $opt_d;
+$flg_verbose_location=$opt_l   if $opt_l;
+$flg_verbose_move=$opt_m       if $opt_m;
+
+
+
+#
+# Getopt stuff (end)
+#
+
+
+sub init {
+  #/*x = 103, $y = 97, $z = 1;*/
+  $x = 103;
+  $y = 97;
+  $z = $k_ground_level;
+  $threshold = 0.3;
+  $crocks = 0;
+  $gold_pieces = 0;
+  set_random_seed();
+}
+
+sub current_location_attributes {
+  my $v = int(w() * 1000);
+  if ($flg_debug){
+    print("$flg_debug: v=$v\n");
+  }
+  if ($v > 35 && $v < 39 && $z > 1) {
+    print("HERE IS A CROCK OF GOLD!");
+    #/* you WONT FIND CROCKS OF GOLD JUST LYING ON THE GROUND! */
+    my $crock=rand() % 100;
+    print("You found %d gold pieces", $crock);
+    $crocks=$crocks+1;
+    $gold_pieces=$gold_pieces+$crock;
+  }
+  #/*
+  #   INSERT OTHER ATTRIBUTE TESTS HERE.
+  # */
+  #/* CHECK FOR EARTHQUAKES: */
+  if (rand() % 1000 == 9) {
+    print("RUMBLE, RUMBLE...");
+    #$threshold = $threshold + 0.2 * rand() - 0.1;*/
+    $threshold = $threshold + 0.2 * randomFloat() - 0.1;
+  }
+  #/* INSERT OTHER LOCATION-DEPENDANT TESTS HERE.*/
+  if ($flg_verbose_location){
+    print("%d_%d_%d - ",$x,$y,$z);
+  }
+  #/*if ($z == 1) {*/
+  if ($z == $k_ground_level) {
+    print("Ground level - ");
+    $z = $z + 1;
+    if (w() < $threshold) {
+      print("A shaft descends from here...\n");
+    } else {
+      print("There is no shaft - keep searching North, South, East or West...\n");
+    }
+    $z = $z - 1;
+  } else {
+    print("Corridors: ");
+    my $nc = 0;
+    $x = $x + 1;
+    if (w() < $threshold) {
+      print("E ");
+      $nc = $nc + 1;
+    }
+    $x = $x - 2;
+    if (w() < $threshold) {
+      print("W ");
+      $nc = $nc + 1;
+    }
+    $x = $x + 1;
+    $y = $y + 1;
+    if (w() < $threshold) {
+      print("N ");
+      $nc = $nc + 1;
+    }
+    $y = $y - 2;
+    if (w() < $threshold) {
+      print("S ");
+      $nc = $nc + 1;
+    }
+    $y = $y + 1;
+    $z = $z + 1;
+    if (w() < $threshold) {
+      print("D ");
+      $nc = $nc + 1;
+    }
+    $z = $z - 2;
+    #/* 
+    # * There will always be an up on this $z+1 == 2 condition,
+    # * even if there isn't a shaft at ground level, 
+    # * won't there? I am not sure ...
+    # */
+    #/*if (w() < $threshold || $z == 2) {*/ #/* Original line, fails due to $z-2 */
+    #/*if (w() < $threshold || $z+1 == 2) {*/ #/* Fixed $z-2 issue */
+    if (w() < $threshold || $z+1 == $k_ground_level+1) { #/* Fixes ground level starts at $z==2 */
+    #/*if (w() < $threshold) {*/
+      print("U");
+      $nc = $nc + 1;
+    }
+    $z = $z + 1;
+    #/* 
+    # * There will always be an up on this $z+1 == 2 condition,
+    # * even if there isn't a shaft at ground level, 
+    # * won't there? I am not sure ...
+    # *
+    # * Also, you can get two U if also w<T
+    # */
+    #/*if (z == 2) {
+    #  print("U");
+    #  $nc = $nc + 1;
+    #}*/
+    if ($nc == 0) {
+      print("None - the earthquake has trapped you.");
+    }
+    print("\n");
+
+  }
+}
+
+sub get_command{
+  my $command;
+
+  print("Enter a direction: ");
+  # https://stackoverflow.com/questions/24099976/read-two-characters-consecutively-using-scanf-in-c */
+  #scanf(" %c", &command);
+  $command = <STDIN>;
+  chomp $command;
+  # or 
+  #scanf("%c", &command);*/
+  #getchar();*/
+  # https://stackoverflow.com/questions/60624380/multiple-chars-in-switch-case-in-c */
+  #switch ($command) {*/
+  $command = lc $command;
+  print "Command: $command\n" if $flg_debug;
+
+  if(  $command eq "n") {
+      go_north();
+    }
+  elsif(  $command eq "s") {
+      go_south();
+    }
+  elsif(  $command eq "e") {
+      go_east();
+    }
+  elsif(  $command eq "w") {
+      go_west();
+    }
+  elsif(  $command eq "u") {
+      go_up();
+    }
+  elsif(  $command eq "d") {
+      go_down();
+    }
+  elsif(  $command eq "l") {
+      do_look();
+    }
+  elsif(  $command eq "h") {
+      do_help();
+    }
+  elsif(  $command eq "q") {
+      exit(0);
+    }
+  elsif(  $command eq "v") {
+      toggle_verbose();
+    }
+  elsif(  $command eq "x") {
+      toggle_flg_debug();
+    }
+    else{
+      print("Invalid input!\n");
+    }
+  #fflush_stdin();   # not needed (???)
+}
+
+# Returns int
+# Takes (int argc, char **argv)
+sub main {
+
+  #set_options(argc, argv);
+
+  init();
+  print_hello();
+  do_help();
+  #/* main loop */
+  do {
+    current_location_attributes();
+    if ($flg_debug) {
+      print("$flg_debug: w=%f\n", w());
+    }
+    get_command();
+
+  }
+  while (1);
+
+  return 0;
+}
+
+main();

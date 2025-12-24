@@ -1,6 +1,8 @@
 # Maze movement
 
-I have just discovered a follow up article by Graham Relf: [Practical Compµting, Sept 1982 - Maze movement](https://archive.org/details/practical-computing/PracticalComputing-1982-09/page/126/mode/2up).
+I have just discovered a follow up article by Graham Relf, on page 126 of [Practical Compµting, Sept 1982 - Maze movement](https://archive.org/details/practical-computing/PracticalComputing-1982-09/page/126/mode/2up) that deals with the challenge of moving objects around a procedural maze.
+
+However, while interesting, it does turn the "endless" maze, into a "bounded" maze - with bounds of 100 (or whatever value you set L to be) on each axis... thus it has an unfortunate downside. Although, the principle concept of minimising memory usage, for a large expansive map, still stands.
 
 [![Maze movement - page 1][1]][1]
 
@@ -25,7 +27,7 @@ Pseudo-code:
 
 BASIC:
 
-    100 L = 00
+    100 L = 99
     110 DIM OX(L), OY(L), OZ(L), OC(L), OS(L), OP(L)
     120 FOR R = 0 TO L
     130 OC(R) = -1 : OP(R) = -2
@@ -36,7 +38,7 @@ Listing 2. Subroutine: Find given object at given location.
 
     Inputs:  Object code, X, Y, Z, W, L, table.
     Outputs: Entry row no ( = -1 if not found),
-             previous row no in chain (= -1 if none).
+             previous row no in chain ( = -1 if none).
 
 
 Pseudo-code:
@@ -227,7 +229,7 @@ Pseudo-code:
             Pointer column (entry row no) = -2
         end if
     else
-        If  pointer column (entry row noO = -1
+        If  pointer column (entry row no) = -1
         then
             Pointer column (previous row no in chain) = -1
             Pointer column (entry row no) = -2
@@ -245,7 +247,7 @@ BASIC:
     5340 OC(R) = -1 : RETURN
 ```
 
-I was wondering how many other articles that Graham wrote, on this particular subject. However, apparently, Graham Relf only wrote two articles for *Practical Computing*, on the subject of Mazes - from [The Forest - History](https://www.grelf.net/foresthistory.html), right at the bottom of the page:
+I was wondering how many other articles Graham wrote, on this particular subject. However, apparently, Graham Relf only wrote two articles for *Practical Computing*, on the subject of Mazes - from [The Forest - History](https://www.grelf.net/foresthistory.html), right at the bottom of the page:
 
 > In 1982 I had two articles published in the now long-defunct British magazine "Practical Computing". The articles described the basic techniques I was using to generate terrain from mathematical functions rather than storing it in memory.
 

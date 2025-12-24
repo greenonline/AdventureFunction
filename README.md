@@ -1,7 +1,9 @@
 # AdventureFunction
 Procedural Dungeon Map
 
-From an article, **Repeatable functions for limitless mazes** by *G.T.Relf*, in [Practical Computing - March 1982][1], page 93
+From an article, **Repeatable functions for limitless mazes** by *G.T.Relf*, in [Practical Computing - March 1982][1], page 93.
+
+See also the follow up article, [Maze movement](https://github.com/greenonline/AdventureFunction/tree/main/Maze_Movement).
 
 ## Listings
 
